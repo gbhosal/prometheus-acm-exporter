@@ -1,0 +1,21 @@
+# Prometheus ACM Exporter Configuration
+# Copy this file to /config/prometheus-acm-exporter.yaml and customize as needed
+
+# AWS Region (optional - if not provided, uses default region from AWS config)
+region: us-east-2
+
+# Port for the Prometheus metrics server (optional - defaults to 9102)
+port: 9102
+
+# AWS Role Assumption (optional - if not provided, uses current credentials)
+# aws-assume-role-arn: arn:aws:iam::123456789012:role/PrometheusACMRole
+# aws-assume-role-session: prometheus-acm-exporter
+
+selected-tags:
+  - APPACCESS
+  - GROUP
+  - ENVIRONMENT
+
+regions:
+  - us-east-1
+  - us-east-2
