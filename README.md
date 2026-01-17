@@ -18,6 +18,28 @@ A Prometheus exporter for AWS Certificate Manager (ACM) that collects certificat
 
 ### Docker
 
+#### Using Published Image (Recommended)
+
+Pull and run the published image from GitHub Container Registry:
+
+```bash
+# Pull the image (replace <owner> with your GitHub username/organization)
+docker pull ghcr.io/<owner>/prometheus-acm-exporter:latest
+
+# Run the container
+docker run -p 9102:9102 \
+  -v /path/to/config.yaml:/config/prometheus-acm-exporter.yaml \
+  -e AWS_ACCESS_KEY_ID=your-key \
+  -e AWS_SECRET_ACCESS_KEY=your-secret \
+  ghcr.io/<owner>/prometheus-acm-exporter:latest
+```
+
+> **Note**: Images are automatically published to GHCR when GitHub releases are created. See [Docker Publishing Guide](docs/docker-publishing.md) for details.
+
+#### Building Locally
+
+To build the image locally:
+
 ```bash
 docker build -t prometheus-acm-exporter:latest .
 docker run -p 9102:9102 \

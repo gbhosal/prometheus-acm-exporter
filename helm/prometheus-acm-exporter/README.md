@@ -13,7 +13,9 @@ This Helm chart deploys the Prometheus ACM Certificate Exporter to Kubernetes.
 ### Basic Installation
 
 ```bash
+# Update image.repository with your GitHub username/organization
 helm install prometheus-acm-exporter ./helm/prometheus-acm-exporter \
+  --set image.repository=ghcr.io/<owner>/prometheus-acm-exporter \
   --set config.region=us-east-2
 ```
 
@@ -40,7 +42,7 @@ The following table lists the configurable parameters:
 | Parameter | Description | Default |
 |-----------|-------------|---------|
 | `replicaCount` | Number of replicas | `1` |
-| `image.repository` | Container image repository | `prometheus-acm-exporter` |
+| `image.repository` | Container image repository | `ghcr.io/<owner>/prometheus-acm-exporter` |
 | `image.tag` | Container image tag | `latest` |
 | `image.pullPolicy` | Image pull policy | `IfNotPresent` |
 | `serviceAccount.create` | Create service account | `true` |
@@ -202,11 +204,42 @@ serviceMonitor:
     release: prometheus
 ```
 
-## Building the Docker Image
+## Container Image
+
+### Using Published Images (Recommended)
+
+The chart is configured to use images published to GitHub Container Registry (GHCR). Images are automatically published when GitHub releases are created.
+
+**Default image location:**
+```
+ghcr.io/<owner>/prometheus-acm-exporter:latest
+```
+
+Replace `<owner>` with your GitHub username or organization name.
+
+**Using a specific version:**
+```yaml
+image:
+  repository: ghcr.io/<owner>/prometheus-acm-exporter
+  tag: v1.0.0  # or 1.0.0, or latest
+```
+
+**Using a different registry:**
+```yaml
+image:
+  repository: your-registry.com/prometheus-acm-exporter
+  tag: latest
+```
+
+### Building the Docker Image Locally
+
+To build the image locally for development:
 
 ```bash
 docker build -t prometheus-acm-exporter:latest .
 ```
+
+For production, use the published images from GHCR. See [Docker Publishing Guide](../../docs/docker-publishing.md) for details on the publishing process.
 
 ## Uninstallation
 
