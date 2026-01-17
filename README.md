@@ -13,6 +13,7 @@ A Prometheus exporter for AWS Certificate Manager (ACM) that collects certificat
 - **Kubernetes Ready**: Includes Helm chart for easy deployment
 - **Lightweight Health Checks**: Efficient `/health` endpoint for container health checks
 - **Pagination Support**: Automatically handles pagination for accounts with many certificates
+- **Multi-Architecture Support**: Docker images support both x86_64 (amd64) and ARM64 architectures
 
 ## Quick Start
 

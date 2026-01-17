@@ -220,6 +220,9 @@ ghcr.io/<owner>/prometheus-acm-exporter:latest
 
 Replace `<owner>` with your GitHub username or organization name.
 
+**Multi-Architecture Support:**
+Images are built for both `linux/amd64` (x86_64) and `linux/arm64` (ARM64) architectures. Docker and Kubernetes will automatically select the correct image for your node's architecture.
+
 **Using a specific version:**
 ```yaml
 image:

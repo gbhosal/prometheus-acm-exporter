@@ -145,12 +145,31 @@ Examples:
 ### Base Image
 - **Base**: `python:3.11-slim`
 - **Size**: ~150-200MB (optimized)
+- **Architectures**: Multi-architecture support for `linux/amd64` (x86_64) and `linux/arm64` (ARM64)
 
 ### Image Structure
 - Application code in `/app`
 - Configuration directory at `/config`
 - Runs as non-root user (`prometheus`, UID 1000)
 - Exposes port `9102` for metrics
+
+### Multi-Architecture Support
+
+Images are automatically built for both architectures:
+- **linux/amd64**: Intel/AMD 64-bit processors (x86_64)
+- **linux/arm64**: ARM 64-bit processors (Apple Silicon, AWS Graviton, etc.)
+
+Docker will automatically pull the correct image for your platform. The same image tag works on both architectures:
+
+```bash
+# Works on both x86_64 and ARM64 systems
+docker pull ghcr.io/<owner>/prometheus-acm-exporter:latest
+```
+
+To verify which architecture you're using:
+```bash
+docker inspect ghcr.io/<owner>/prometheus-acm-exporter:latest | grep Architecture
+```
 
 ### Health Check
 The image includes a health check that uses the `/health` endpoint:

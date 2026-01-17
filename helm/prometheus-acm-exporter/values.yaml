@@ -7,7 +7,7 @@ image:
   # Replace <owner> with your GitHub username or organization name
   # Example: ghcr.io/myusername/prometheus-acm-exporter
   # To use a different registry, override this value during installation
-  repository: ghcr.io/<owner>/prometheus-acm-exporter
+  repository: ghcr.io/gbhosal/prometheus-acm-exporter
   pullPolicy: IfNotPresent
   # Default tag - uses 'latest' for most recent release
   # Override with specific version tag (e.g., v1.0.0, 1.0.0) for versioned releases
