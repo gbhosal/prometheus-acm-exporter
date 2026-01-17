@@ -2,7 +2,7 @@ apiVersion: v2
 name: prometheus-acm-exporter
 description: A Helm chart for Prometheus ACM Certificate Exporter
 type: application
-version: 0.1.0
+version: 1.0.0
 appVersion: "1.0.0"
 keywords:
   - prometheus
