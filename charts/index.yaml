@@ -1,0 +1,22 @@
+apiVersion: v1
+entries:
+  prometheus-acm-exporter:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2026-01-17T05:27:49.098642102Z"
+    description: A Helm chart for Prometheus ACM Certificate Exporter
+    digest: 70ee206a3288c7d031f2126cee16a19499df2d3b5fedd76bdbaffd1545cdb717
+    keywords:
+    - prometheus
+    - acm
+    - aws
+    - exporter
+    - metrics
+    maintainers:
+    - name: SHS Infrastructure Team
+    name: prometheus-acm-exporter
+    type: application
+    urls:
+    - https://gbhosal.github.io/prometheus-acm-exporter/charts/prometheus-acm-exporter-0.1.0.tgz
+    version: 0.1.0
+generated: "2026-01-17T05:27:49.098037609Z"
