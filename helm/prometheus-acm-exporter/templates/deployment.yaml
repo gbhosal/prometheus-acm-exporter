@@ -53,6 +53,41 @@ spec:
             failureThreshold: 3
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          {{- if or .Values.env .Values.envValueFrom .Values.envFrom.secretRef .Values.envFrom.configMapRef }}
+          {{- if or .Values.env .Values.envValueFrom }}
+          env:
+            {{- if .Values.env }}
+            {{- range $key, $value := .Values.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            {{- end }}
+            {{- if .Values.envValueFrom }}
+            {{- toYaml .Values.envValueFrom | nindent 12 }}
+            {{- end }}
+          {{- end }}
+          {{- if or .Values.envFrom.secretRef .Values.envFrom.configMapRef }}
+          envFrom:
+            {{- if .Values.envFrom.secretRef }}
+            {{- range .Values.envFrom.secretRef }}
+            - secretRef:
+                name: {{ .name }}
+                {{- if hasKey . "optional" }}
+                optional: {{ .optional }}
+                {{- end }}
+            {{- end }}
+            {{- end }}
+            {{- if .Values.envFrom.configMapRef }}
+            {{- range .Values.envFrom.configMapRef }}
+            - configMapRef:
+                name: {{ .name }}
+                {{- if hasKey . "optional" }}
+                optional: {{ .optional }}
+                {{- end }}
+            {{- end }}
+            {{- end }}
+          {{- end }}
+          {{- end }}
           volumeMounts:
             - name: config
               mountPath: /config

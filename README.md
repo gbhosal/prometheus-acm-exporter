@@ -29,11 +29,28 @@ docker run -p 9102:9102 \
 
 ### Kubernetes/Helm
 
+#### Using the Helm Chart from Repository
+
+```bash
+# Add the Helm repository (after publishing)
+helm repo add prometheus-acm-exporter https://<your-username>.github.io/prometheus-acm-exporter/charts
+helm repo update
+
+# Install from repository
+helm install my-release prometheus-acm-exporter/prometheus-acm-exporter \
+  --set config.regions[0]=us-east-1 \
+  --set config.regions[1]=us-east-2
+```
+
+#### Using the Local Helm Chart
+
 ```bash
 helm install prometheus-acm-exporter ./helm/prometheus-acm-exporter \
   --set config.regions[0]=us-east-1 \
   --set config.regions[1]=us-east-2
 ```
+
+> **Note**: See [docs/helm-repository.md](docs/helm-repository.md) for instructions on publishing the Helm chart to a repository.
 
 ### Local Development
 

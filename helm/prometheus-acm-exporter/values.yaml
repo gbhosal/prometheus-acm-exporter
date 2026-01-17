@@ -81,6 +81,55 @@ config:
   #   - COSTCENTER
   #   - GROUP
 
+# Environment variables configuration
+# Supports multiple methods for secure injection:
+# 1. Plain environment variables (env)
+# 2. Environment variables from Secrets (envFrom.secretRef)
+# 3. Environment variables from ConfigMaps (envFrom.configMapRef)
+# 4. Individual secret/configmap keys (env[].valueFrom)
+env:
+  # Plain environment variables (key-value pairs)
+  # Example:
+  # AWS_REGION: us-east-1
+  # LOG_LEVEL: INFO
+  {}
+  
+envFrom:
+  # Load all keys from a Secret as environment variables
+  # Example:
+  # secretRef:
+  #   - name: aws-credentials
+  #     optional: false
+  secretRef: []
+  
+  # Load all keys from a ConfigMap as environment variables
+  # Example:
+  # configMapRef:
+  #   - name: app-config
+  #     optional: false
+  configMapRef: []
+
+# Additional environment variables with valueFrom (for individual keys)
+# This allows referencing specific keys from Secrets or ConfigMaps
+# Example:
+# envValueFrom:
+#   - name: AWS_ACCESS_KEY_ID
+#     secretKeyRef:
+#       name: aws-credentials
+#       key: access-key-id
+#       optional: false
+#   - name: AWS_SECRET_ACCESS_KEY
+#     secretKeyRef:
+#       name: aws-credentials
+#       key: secret-access-key
+#       optional: false
+#   - name: AWS_SESSION_TOKEN
+#     secretKeyRef:
+#       name: aws-credentials
+#       key: session-token
+#       optional: true
+envValueFrom: []
+
 # ServiceMonitor for Prometheus Operator
 serviceMonitor:
   enabled: true

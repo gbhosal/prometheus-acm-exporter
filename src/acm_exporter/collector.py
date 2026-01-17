@@ -1,8 +1,11 @@
 import boto3
 import yaml
 import os
+import logging
 from datetime import datetime, timezone
 from prometheus_client.core import GaugeMetricFamily
+
+logger = logging.getLogger(__name__)
 
 
 def load_config(config_path=None):
@@ -12,16 +15,16 @@ def load_config(config_path=None):
         config_path = '/config/prometheus-acm-exporter.yaml'
     
     if not os.path.exists(config_path):
-        print(f"Config file not found at {config_path}, using defaults")
+        logger.warning(f"Config file not found at {config_path}, using defaults")
         return {}
     
     try:
         with open(config_path, 'r') as f:
             config = yaml.safe_load(f) or {}
-        print(f"Loaded configuration from {config_path}")
+        logger.info(f"Loaded configuration from {config_path}")
         return config
     except Exception as e:
-        print(f"Error loading config file {config_path}: {e}")
+        logger.error(f"Error loading config file {config_path}: {e}", exc_info=True)
         return {}
 
 
@@ -50,7 +53,7 @@ def get_aws_session(config):
             )
             print(f"Assumed role: {assume_role_arn}")
         except Exception as e:
-            print(f"Error assuming role {assume_role_arn}: {e}")
+            logger.error(f"Error assuming role {assume_role_arn}: {e}", exc_info=True)
             raise
     
     return session
@@ -94,7 +97,7 @@ class ACMCertificateCollector:
         try:
             self.aws_account = self.sts_client.get_caller_identity().get('Account', 'unknown')
         except Exception as e:
-            print(f"Error getting AWS account ID: {e}")
+            logger.warning(f"Error getting AWS account ID: {e}", exc_info=True)
             self.aws_account = 'unknown'
         
         # Get selected tags configuration (list of tag keys to include)
@@ -126,7 +129,7 @@ class ACMCertificateCollector:
                     for page in page_iterator:
                         certs.extend(page.get('CertificateSummaryList', []))
                 except Exception as e:
-                    print(f"Error listing certificates in region {region}: {e}")
+                    logger.error(f"Error listing certificates in region {region}: {e}", exc_info=True)
                     continue  # Continue with other regions
                 
                 # Process certificates from this region
@@ -183,7 +186,7 @@ class ACMCertificateCollector:
                                     label_name = 'tags_' + key.strip().replace('-', '_')
                                     tags[label_name] = value.strip()
                     except Exception as e:
-                        print(f"Error fetching tags for {arn} in region {region}: {e}")
+                        logger.warning(f"Error fetching tags for {arn} in region {region}: {e}", exc_info=True)
 
                     # Always add certificate to metrics_data, even if it has no tags
                     # Certificates without tags will have an empty tags dict {}
@@ -198,7 +201,7 @@ class ACMCertificateCollector:
                         'tags': tags
                     })
             except Exception as e:
-                print(f"Error collecting from region {region}: {e}")
+                logger.error(f"Error collecting from region {region}: {e}", exc_info=True)
                 continue  # Continue with other regions
 
         # Group certificates by their tag key sets to avoid empty label values
