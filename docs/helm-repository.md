@@ -17,8 +17,14 @@ We've set up a GitHub Actions workflow (`.github/workflows/publish-helm-chart.ym
 
 1. Lints the Helm chart
 2. Packages the chart
-3. Generates/updates the `index.yaml`
+3. Merges with existing `index.yaml` to preserve all versions
 4. Publishes to GitHub Pages
+
+**Version Management:**
+- All chart versions are preserved in the repository
+- Each new release adds to the existing versions (doesn't replace them)
+- Users can install specific versions or use the latest
+- The `index.yaml` file maintains a complete history of all published versions
 
 #### Setup Steps:
 
@@ -73,8 +79,14 @@ helm repo add prometheus-acm-exporter https://<your-username>.github.io/<repo-na
 # Update repository index
 helm repo update
 
-# Install the chart
+# Install the latest version
 helm install my-release prometheus-acm-exporter/prometheus-acm-exporter
+
+# Install a specific version
+helm install my-release prometheus-acm-exporter/prometheus-acm-exporter --version 0.1.0
+
+# List all available versions
+helm search repo prometheus-acm-exporter/prometheus-acm-exporter --versions
 ```
 
 ## Option 2: OCI Registry (Modern Approach)
@@ -152,12 +164,58 @@ Artifact Hub is a web-based application that helps you find, install and publish
    - PATCH: Bug fixes
 
 2. **Update Chart.yaml**: Always update the `version` field in `Chart.yaml` before publishing
+   - Each version must be unique
+   - Versions cannot be downgraded (Helm requirement)
+   - Once published, a version cannot be republished
 
-3. **Tag Releases**: Create GitHub releases for chart versions:
+3. **Multiple Versions**: The workflow automatically preserves all versions
+   - Old versions remain available for users who need them
+   - New versions are added without removing old ones
+   - The `index.yaml` file tracks all versions
+
+4. **Tag Releases**: Create GitHub releases for chart versions:
    ```bash
    git tag -a v0.1.0 -m "Release version 0.1.0"
    git push origin v0.1.0
    ```
+
+5. **Version History**: View all published versions:
+   ```bash
+   # After adding the repo
+   helm search repo prometheus-acm-exporter/prometheus-acm-exporter --versions
+   ```
+
+### Managing Multiple Chart Versions
+
+The workflow automatically manages multiple chart versions:
+
+- **First Release**: Creates initial `index.yaml` and publishes the chart
+- **Subsequent Releases**: 
+  - Merges new chart package with existing packages
+  - Updates `index.yaml` to include the new version
+  - Preserves all previous versions
+  - All `.tgz` files are kept in the `charts/` directory
+
+**Example version history:**
+```
+charts/
+  ├── prometheus-acm-exporter-0.1.0.tgz
+  ├── prometheus-acm-exporter-0.1.1.tgz
+  ├── prometheus-acm-exporter-0.2.0.tgz
+  └── index.yaml  (contains metadata for all versions)
+```
+
+**Users can install any version:**
+```bash
+# Install latest
+helm install my-release prometheus-acm-exporter/prometheus-acm-exporter
+
+# Install specific version
+helm install my-release prometheus-acm-exporter/prometheus-acm-exporter --version 0.1.0
+
+# Upgrade to newer version
+helm upgrade my-release prometheus-acm-exporter/prometheus-acm-exporter --version 0.2.0
+```
 
 ## Troubleshooting
 

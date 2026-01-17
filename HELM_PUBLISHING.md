@@ -52,7 +52,7 @@ Before publishing a new version:
 
 1. Update `helm/prometheus-acm-exporter/Chart.yaml`:
    ```yaml
-   version: 0.1.1  # Increment version
+   version: 0.1.1  # Increment version (must be unique and higher than previous)
    appVersion: "1.0.0"  # Update if application version changed
    ```
 
@@ -63,7 +63,13 @@ Before publishing a new version:
    git push
    ```
 
-3. The workflow will automatically package and publish the new version.
+3. The workflow will automatically:
+   - Package the new version
+   - Merge it with existing versions (preserving all previous versions)
+   - Update the index.yaml to include the new version
+   - Publish to GitHub Pages
+
+**Important:** All chart versions are preserved. Users can install any version they need.
 
 ## 📦 Using Your Published Chart
 
@@ -76,9 +82,17 @@ helm repo add prometheus-acm-exporter https://<your-username>.github.io/promethe
 # Update
 helm repo update
 
-# Install
+# Install latest version
 helm install my-release prometheus-acm-exporter/prometheus-acm-exporter \
   --set config.regions[0]=us-east-1
+
+# Install specific version
+helm install my-release prometheus-acm-exporter/prometheus-acm-exporter \
+  --version 0.1.0 \
+  --set config.regions[0]=us-east-1
+
+# List all available versions
+helm search repo prometheus-acm-exporter/prometheus-acm-exporter --versions
 ```
 
 ## 🔍 Troubleshooting

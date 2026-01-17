@@ -48,9 +48,32 @@ jobs:
         run: |
           helm package helm/prometheus-acm-exporter --destination ./charts
 
-      - name: Create index.yaml
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages
+          fetch-depth: 0
+
+      - name: Merge existing charts (if any)
         run: |
-          helm repo index ./charts --url https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/charts
+          if [ -d "gh-pages/charts" ] && [ "$(ls -A gh-pages/charts/*.tgz 2>/dev/null)" ]; then
+            echo "Found existing charts, copying to preserve versions..."
+            cp gh-pages/charts/*.tgz ./charts/ || true
+          else
+            echo "No existing charts found, starting fresh..."
+          fi
+
+      - name: Create/Update index.yaml
+        run: |
+          # Create or update index.yaml, merging with existing if present
+          if [ -f "gh-pages/charts/index.yaml" ]; then
+            echo "Merging with existing index.yaml..."
+            helm repo index ./charts --url https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/charts --merge gh-pages/charts/index.yaml
+          else
+            echo "Creating new index.yaml..."
+            helm repo index ./charts --url https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/charts
+          fi
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
@@ -58,12 +81,16 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./charts
           destination_dir: charts
-          keep_files: false
+          keep_files: true
 
       - name: Output repository URL
         run: |
+          CHART_VERSION=$(helm show chart helm/prometheus-acm-exporter | grep '^version:' | awk '{print $2}')
           echo "::notice::Helm chart published successfully!"
+          echo "::notice::Chart version: $CHART_VERSION"
+          echo "::notice::All versions are preserved in the repository"
           echo "::notice::Add this repository to Helm:"
           echo "::notice::helm repo add ${{ github.event.repository.name }} https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/charts"
           echo "::notice::helm repo update"
-          echo "::notice::helm install my-release ${{ github.event.repository.name }}/prometheus-acm-exporter"
+          echo "::notice::Install latest: helm install my-release ${{ github.event.repository.name }}/prometheus-acm-exporter"
+          echo "::notice::Install specific version: helm install my-release ${{ github.event.repository.name }}/prometheus-acm-exporter --version $CHART_VERSION"
