@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "prometheus-acm-exporter.fullname" . }}-config
+  labels:
+    {{- include "prometheus-acm-exporter.labels" . | nindent 4 }}
+data:
+  prometheus-acm-exporter.yaml: |
+    {{- if .Values.config.regions }}
+    regions:
+    {{- range .Values.config.regions }}
+      - {{ . }}
+    {{- end }}
+    {{- else if .Values.config.region }}
+    region: {{ .Values.config.region }}
+    {{- end }}
+    port: {{ .Values.config.port | default 9102 }}
+    {{- if .Values.config.awsAssumeRoleArn }}
+    aws-assume-role-arn: {{ .Values.config.awsAssumeRoleArn }}
+    {{- end }}
+    {{- if .Values.config.awsAssumeRoleSession }}
+    aws-assume-role-session: {{ .Values.config.awsAssumeRoleSession }}
+    {{- end }}
+    {{- if .Values.config.selectedTags }}
+    selected-tags:
+    {{- range .Values.config.selectedTags }}
+      - {{ . }}
+    {{- end }}
+    {{- end }}

@@ -1,0 +1,142 @@
+# Default values for prometheus-acm-exporter
+replicaCount: 1
+
+image:
+  repository: prometheus-acm-exporter
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  fsGroup: 1000
+  runAsNonRoot: true
+  runAsUser: 1000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: false
+
+service:
+  type: ClusterIP
+  port: 9102
+  annotations: {}
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Configuration for the ACM exporter
+config:
+  # AWS Region (single - for backward compatibility)
+  region: ""
+  # AWS Regions (list) - if specified, collects from all listed regions
+  # If both region and regions are specified, regions takes precedence
+  regions: []
+  # Example:
+  # regions:
+  #   - us-east-1
+  #   - us-east-2
+  #   - us-west-2
+  # Port for metrics server
+  port: 9102
+  # AWS Role ARN to assume (optional)
+  awsAssumeRoleArn: ""
+  # AWS Role session name (optional)
+  awsAssumeRoleSession: "prometheus-acm-exporter"
+  # Selected Tags (optional - if not provided, all tags are included)
+  # Only tags listed here will be included in the metrics labels
+  # Tag keys should match exactly as they appear in AWS (case-sensitive)
+  selectedTags: []
+  # Example:
+  # selectedTags:
+  #   - Environment
+  #   - APPACCESS
+  #   - COSTCENTER
+  #   - GROUP
+
+# Environment variables configuration
+# Supports multiple methods for secure injection:
+# 1. Plain environment variables (env)
+# 2. Environment variables from Secrets (envFrom.secretRef)
+# 3. Environment variables from ConfigMaps (envFrom.configMapRef)
+# 4. Individual secret/configmap keys (env[].valueFrom)
+env:
+  # Plain environment variables (key-value pairs)
+  # Example:
+  # AWS_REGION: us-east-1
+  # LOG_LEVEL: INFO
+  {}
+  
+envFrom:
+  # Load all keys from a Secret as environment variables
+  # Example:
+  # secretRef:
+  #   - name: aws-credentials
+  #     optional: false
+  secretRef: []
+  
+  # Load all keys from a ConfigMap as environment variables
+  # Example:
+  # configMapRef:
+  #   - name: app-config
+  #     optional: false
+  configMapRef: []
+
+# Additional environment variables with valueFrom (for individual keys)
+# This allows referencing specific keys from Secrets or ConfigMaps
+# Example:
+# envValueFrom:
+#   - name: AWS_ACCESS_KEY_ID
+#     secretKeyRef:
+#       name: aws-credentials
+#       key: access-key-id
+#       optional: false
+#   - name: AWS_SECRET_ACCESS_KEY
+#     secretKeyRef:
+#       name: aws-credentials
+#       key: secret-access-key
+#       optional: false
+#   - name: AWS_SESSION_TOKEN
+#     secretKeyRef:
+#       name: aws-credentials
+#       key: session-token
+#       optional: true
+envValueFrom: []
+
+# ServiceMonitor for Prometheus Operator
+serviceMonitor:
+  enabled: true
+  interval: 30s
+  scrapeTimeout: 10s
+  labels: {}
+  annotations: {}
+  # Additional labels for ServiceMonitor selector
+  # Example: release: prometheus
+  selector: {}
