@@ -13,6 +13,7 @@ regions:
   - eu-west-1
 
 # Port for the Prometheus metrics server (optional - defaults to 9102)
+# Note: PORT environment variable takes precedence over this setting
 port: 9102
 
 # AWS Role Assumption (optional - if not provided, uses current credentials)

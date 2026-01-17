@@ -106,16 +106,22 @@ export AWS_REGION=us-east-1
 ```yaml
 regions:
   - us-east-1
-port: 9102
+port: 9102  # Can also be set via PORT environment variable
 ```
 
 3. **Run the exporter:**
 ```bash
+# Using config file
+python -m src.acm_exporter --config test-config.yaml
+
+# Or using PORT environment variable (takes precedence)
+export PORT=8080
 python -m src.acm_exporter --config test-config.yaml
 ```
 
 4. **Test endpoints:**
 ```bash
+# Default port 9102, or use PORT env var value
 curl http://localhost:9102/health
 curl http://localhost:9102/metrics
 ```
@@ -156,7 +162,14 @@ docker build -t prometheus-acm-exporter:dev .
 
 Test the image:
 ```bash
+# Using default port
 docker run -p 9102:9102 \
+  -v $(pwd)/examples/config.yaml:/config/prometheus-acm-exporter.yaml \
+  prometheus-acm-exporter:dev
+
+# Using custom port via environment variable
+docker run -p 8080:8080 \
+  -e PORT=8080 \
   -v $(pwd)/examples/config.yaml:/config/prometheus-acm-exporter.yaml \
   prometheus-acm-exporter:dev
 ```

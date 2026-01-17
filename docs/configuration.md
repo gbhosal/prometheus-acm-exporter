@@ -36,9 +36,22 @@ regions:
 
 Port number for the metrics HTTP server. Defaults to `9102`.
 
-**Example:**
+**Note:** The `PORT` environment variable takes precedence over the config file setting. If `PORT` is set, it will be used instead of the `port` value in the config file.
+
+**Priority order:**
+1. `PORT` environment variable (highest priority)
+2. `port` in config file
+3. Default value `9102` (lowest priority)
+
+**Example (config file):**
 ```yaml
 port: 9102
+```
+
+**Example (environment variable):**
+```bash
+export PORT=8080
+python -m src.acm_exporter
 ```
 
 ### `aws-assume-role-arn` (string, optional)
@@ -121,9 +134,14 @@ The exporter uses standard AWS SDK environment variables for credentials:
 ## Configuration Precedence
 
 1. Command-line arguments (`--config`)
-2. Configuration file settings
-3. Environment variables (for AWS credentials)
+2. Environment variables (`PORT` for port, AWS credentials for authentication)
+3. Configuration file settings
 4. Default values
+
+**Specific precedence for port:**
+- `PORT` environment variable (highest priority)
+- `port` in config file
+- Default: `9102`
 
 ## Multi-Region Configuration
 

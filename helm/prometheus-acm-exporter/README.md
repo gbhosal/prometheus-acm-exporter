@@ -76,8 +76,11 @@ For non-sensitive configuration values:
 env:
   AWS_REGION: us-east-1
   LOG_LEVEL: INFO
+  PORT: 8080  # Overrides config.port if set (takes precedence)
   CUSTOM_SETTING: value
 ```
+
+**Note:** The `PORT` environment variable takes precedence over the `config.port` setting. This is useful for containerized deployments where you want to configure the port without modifying the config file.
 
 ### Method 2: Environment Variables from Secrets (envFrom)
 

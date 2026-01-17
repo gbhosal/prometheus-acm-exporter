@@ -173,6 +173,21 @@ docker run -d \
   ghcr.io/<owner>/prometheus-acm-exporter:latest
 ```
 
+**Using custom port via environment variable:**
+
+```bash
+docker run -d \
+  --name prometheus-acm-exporter \
+  -p 8080:8080 \
+  -v /path/to/config.yaml:/config/prometheus-acm-exporter.yaml \
+  -e PORT=8080 \
+  -e AWS_ACCESS_KEY_ID=your-key \
+  -e AWS_SECRET_ACCESS_KEY=your-secret \
+  ghcr.io/<owner>/prometheus-acm-exporter:latest
+```
+
+> **Note:** The `PORT` environment variable takes precedence over the `port` setting in the config file.
+
 ### Docker Compose
 
 ```yaml
@@ -181,12 +196,13 @@ services:
   prometheus-acm-exporter:
     image: ghcr.io/<owner>/prometheus-acm-exporter:latest
     ports:
-      - "9102:9102"
+      - "9102:9102"  # Or use PORT env var to customize
     volumes:
       - ./config.yaml:/config/prometheus-acm-exporter.yaml
     environment:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      # - PORT=8080  # Optional: override port from config file
 ```
 
 ### Kubernetes/Helm

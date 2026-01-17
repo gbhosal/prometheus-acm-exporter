@@ -32,6 +32,21 @@ docker run -d \
   prometheus-acm-exporter:latest
 ```
 
+#### Using Custom Port via Environment Variable
+
+You can override the port using the `PORT` environment variable:
+
+```bash
+docker run -d \
+  --name acm-exporter \
+  -p 8080:8080 \
+  -v /path/to/config.yaml:/config/prometheus-acm-exporter.yaml \
+  -e PORT=8080 \
+  -e AWS_ACCESS_KEY_ID=your-access-key \
+  -e AWS_SECRET_ACCESS_KEY=your-secret-key \
+  prometheus-acm-exporter:latest
+```
+
 #### Using AWS IAM Role (EC2/ECS)
 
 If running on EC2 or ECS with an IAM role:
@@ -108,7 +123,7 @@ Create a configuration file (see `examples/config.yaml` for a template):
 regions:
   - us-east-1
   - us-east-2
-port: 9102
+port: 9102  # Can also be set via PORT environment variable
 ```
 
 ## AWS Credentials Setup

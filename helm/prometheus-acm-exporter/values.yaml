@@ -73,6 +73,8 @@ config:
   #   - us-east-2
   #   - us-west-2
   # Port for metrics server
+  # Note: PORT environment variable (set via env section below) takes precedence over this setting
+  # Priority: PORT env var > config.port > default (9102)
   port: 9102
   # AWS Role ARN to assume (optional)
   awsAssumeRoleArn: ""
@@ -100,6 +102,7 @@ env:
   # Example:
   # AWS_REGION: us-east-1
   # LOG_LEVEL: INFO
+  # PORT: 8080  # Overrides config.port if set
   {}
   
 envFrom:

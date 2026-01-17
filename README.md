@@ -101,7 +101,7 @@ regions:
   - us-east-2
   - us-west-2
 
-# Port for metrics server
+# Port for metrics server (can also be set via PORT environment variable)
 port: 9102
 
 # AWS Role Assumption (optional)
