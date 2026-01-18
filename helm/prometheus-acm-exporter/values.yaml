@@ -79,7 +79,7 @@ config:
   # AWS Role ARN to assume (optional)
   awsAssumeRoleArn: ""
   # AWS Role session name (optional)
-  awsAssumeRoleSession: "prometheus-acm-exporter"
+  awsAssumeRoleSession: ""
   # Selected Tags (optional - if not provided, all tags are included)
   # Only tags listed here will be included in the metrics labels
   # Tag keys should match exactly as they appear in AWS (case-sensitive)
