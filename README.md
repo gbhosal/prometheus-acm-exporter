@@ -25,7 +25,7 @@ Pull and run the published image from GitHub Container Registry:
 
 ```bash
 # Pull the image (replace <owner> with your GitHub username/organization)
-docker pull ghcr.io/<owner>/prometheus-acm-exporter:latest
+docker pull ghcr.io/gbhosal/prometheus-acm-exporter:latest
 
 # Run the container
 docker run -p 9102:9102 \
@@ -56,7 +56,7 @@ docker run -p 9102:9102 \
 
 ```bash
 # Add the Helm repository (after publishing)
-helm repo add prometheus-acm-exporter https://<your-username>.github.io/prometheus-acm-exporter/charts
+helm repo add prometheus-acm-exporter https://gbhosal.github.io/prometheus-acm-exporter/charts
 helm repo update
 
 # Install from repository

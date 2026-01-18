@@ -25,7 +25,7 @@ serviceAccount:
   annotations: {}
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
-  name: ""
+  name: "prometheus-acm-exporter-sa"
 
 podAnnotations: {}
 
@@ -143,9 +143,9 @@ envValueFrom: []
 
 # ServiceMonitor for Prometheus Operator
 serviceMonitor:
-  enabled: true
-  interval: 30s
-  scrapeTimeout: 10s
+  enabled: false
+  interval: 120s
+  scrapeTimeout: 60s
   labels: {}
   annotations: {}
   # Additional labels for ServiceMonitor selector
