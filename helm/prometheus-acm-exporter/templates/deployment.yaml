@@ -22,7 +22,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "prometheus-acm-exporter.serviceAccountName" . }}
+      serviceAccountName: {{ include "prometheus-acm-exporter.serviceAccountName" . }}-sa
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
