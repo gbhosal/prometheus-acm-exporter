@@ -162,7 +162,7 @@ Attach an IAM role to your EC2 instance or ECS task with the required permission
 After installation, verify the exporter is working:
 
 ```bash
-# Check health endpoint
+# Check health endpoint (or /healthz)
 curl http://localhost:9102/health
 
 # Check metrics endpoint
@@ -171,14 +171,20 @@ curl http://localhost:9102/metrics
 
 You should see Prometheus metrics output with ACM certificate data.
 
+**Note:** The exporter only collects certificates with status `ISSUED`. Certificates in PENDING_VALIDATION, REVOKED, or other states are not included in the metrics.
+
 ## Troubleshooting
 
 ### Common Issues
 
-1. **No metrics appearing**: Check AWS credentials and IAM permissions
+1. **No metrics appearing**: 
+   - Check AWS credentials and IAM permissions
+   - Verify you have `ISSUED` certificates in the configured regions (only ISSUED certificates are collected)
+   - Check exporter logs for errors
 2. **Connection errors**: Verify network connectivity to AWS APIs
 3. **Permission denied**: Ensure IAM role/user has required ACM permissions
 4. **Config file not found**: Verify the config file path is correct
+5. **Missing certificates**: Only certificates with status `ISSUED` are included. Certificates in PENDING_VALIDATION, REVOKED, or other states are excluded
 
 ### Debug Mode
 

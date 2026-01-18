@@ -125,6 +125,8 @@ The exporter exposes the following metric:
 
 The number of days until an ACM certificate expires.
 
+**Note:** Only certificates with status `ISSUED` are collected. Certificates in other states (PENDING_VALIDATION, VALIDATION_TIMED_OUT, REVOKED, etc.) are not included in the metrics.
+
 **Labels:**
 - `region`: AWS region where the certificate is located
 - `aws_account`: AWS account ID
@@ -154,6 +156,7 @@ acm_certificate_expiry_duration_days{
 
 - `/metrics`: Prometheus metrics endpoint
 - `/health`: Health check endpoint (returns 200 OK)
+- `/healthz`: Alternative health check endpoint (returns 200 OK, same as `/health`)
 
 ## AWS IAM Permissions
 

@@ -122,9 +122,11 @@ python -m src.acm_exporter --config test-config.yaml
 4. **Test endpoints:**
 ```bash
 # Default port 9102, or use PORT env var value
-curl http://localhost:9102/health
+curl http://localhost:9102/health  # or /healthz
 curl http://localhost:9102/metrics
 ```
+
+**Note:** Only certificates with status `ISSUED` will appear in metrics. Certificates in other states are excluded.
 
 ### Unit Testing
 

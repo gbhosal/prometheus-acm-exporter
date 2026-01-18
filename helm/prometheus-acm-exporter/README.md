@@ -195,6 +195,8 @@ The service account or IAM role needs the following permissions:
 - `sts:GetCallerIdentity`
 - `sts:AssumeRole` (if using role assumption)
 
+**Note:** The exporter only collects certificates with status `ISSUED`. Certificates in other states (PENDING_VALIDATION, REVOKED, etc.) are not included in the metrics.
+
 ## ServiceMonitor
 
 The chart includes a ServiceMonitor resource for Prometheus Operator. Make sure to configure the `serviceMonitor.selector` labels to match your Prometheus instance's serviceMonitorSelector.

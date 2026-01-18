@@ -6,6 +6,8 @@ This document describes all configuration options available for the Prometheus A
 
 The exporter is configured via a YAML file. By default, it looks for `/config/prometheus-acm-exporter.yaml`, but you can specify a custom path using the `--config` command-line argument.
 
+**Important:** The exporter only collects certificates with status `ISSUED`. Certificates in other states (PENDING_VALIDATION, VALIDATION_TIMED_OUT, REVOKED, FAILED, etc.) are not included in the metrics.
+
 ## Configuration Options
 
 ### `region` (string, optional)
@@ -205,3 +207,4 @@ Initialized ACM client for region: us-east-2
 2. **Invalid YAML**: Validate your YAML syntax
 3. **Region not accessible**: Verify AWS credentials have access to the specified regions
 4. **Role assumption fails**: Check IAM permissions and role ARN
+5. **No certificates appearing**: Remember that only `ISSUED` certificates are collected. Certificates in PENDING_VALIDATION or other states won't appear in metrics
