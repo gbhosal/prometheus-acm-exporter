@@ -3,6 +3,7 @@ import yaml
 import os
 import logging
 from datetime import datetime, timezone, timedelta
+from botocore.exceptions import ClientError
 from prometheus_client.core import GaugeMetricFamily
 logger = logging.getLogger(__name__)
 
