@@ -208,3 +208,13 @@ Initialized ACM client for region: us-east-2
 3. **Region not accessible**: Verify AWS credentials have access to the specified regions
 4. **Role assumption fails**: Check IAM permissions and role ARN
 5. **No certificates appearing**: Remember that only `ISSUED` certificates are collected. Certificates in PENDING_VALIDATION or other states won't appear in metrics
+
+### "The security token included in the request is invalid" (UnrecognizedClientException)
+
+This error means the AWS credentials in use are invalid or expired. Check the following:
+
+- **Credentials source**: The exporter uses the default credential chain: environment variables (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_SESSION_TOKEN`), then `~/.aws/credentials`, then IAM role (e.g. in EKS/ECS). Ensure the exporter can see the credentials (e.g. in Docker, pass env vars or mount `~/.aws`).
+- **Expired credentials**: If using temporary credentials (assumed role, AWS SSO, or session token), they expire. Refresh or re-assume the role and restart the exporter.
+- **Wrong or rotated keys**: If the access key was rotated or deleted in IAM, update the credentials (env vars or `~/.aws/credentials`).
+- **Session token required**: When using temporary credentials you must set all three: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and `AWS_SESSION_TOKEN`. Using only access key and secret without a token (or with an old token) can cause this error.
+- **Role assumption**: If using `aws-assume-role-arn`, the *base* credentials (used to call STS AssumeRole) must be valid; the assumed-role credentials are then used for ACM. Fix the base credentials first.

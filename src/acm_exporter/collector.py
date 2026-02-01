@@ -2,9 +2,8 @@ import boto3
 import yaml
 import os
 import logging
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from prometheus_client.core import GaugeMetricFamily
-
 logger = logging.getLogger(__name__)
 
 
@@ -29,15 +28,19 @@ def load_config(config_path=None):
 
 
 def get_aws_session(config):
-    """Get AWS session, optionally assuming a role."""
-    # Don't require region here - will be set per client
+    """Get AWS session, optionally assuming a role.
+
+    Returns:
+        tuple: (session, credentials_expiration). expiration is None when not using
+        role assumption; otherwise a timezone-aware datetime when the assumed-role
+        credentials expire.
+    """
     assume_role_arn = config.get('aws-assume-role-arn')
     assume_role_session = config.get('aws-assume-role-session', 'prometheus-acm-exporter')
-    
-    # Start with default session (region will be set per client)
+
     session = boto3.Session()
-    
-    # If role assumption is configured, assume the role
+    expiration = None
+
     if assume_role_arn:
         try:
             sts_client = session.client('sts')
@@ -51,71 +54,92 @@ def get_aws_session(config):
                 aws_secret_access_key=credentials['SecretAccessKey'],
                 aws_session_token=credentials['SessionToken']
             )
-            print(f"Assumed role: {assume_role_arn}")
+            exp = credentials.get('Expiration')
+            if exp is not None and exp.tzinfo is None:
+                exp = exp.replace(tzinfo=timezone.utc)
+            expiration = exp
+            logger.info("Assumed role: %s (expires %s)", assume_role_arn, expiration)
         except Exception as e:
-            logger.error(f"Error assuming role {assume_role_arn}: {e}", exc_info=True)
+            logger.error("Error assuming role %s: %s", assume_role_arn, e, exc_info=True)
             raise
-    
-    return session
+
+    return session, expiration
 
 
 class ACMCertificateCollector:
     """Custom collector to fetch ACM certificate data on each scrape."""
 
+    # Refresh assumed-role credentials this many minutes before expiry
+    _REFRESH_MARGIN_MINUTES = 5
+
     def __init__(self, config=None):
         """Initialize collector with configuration."""
         if config is None:
             config = {}
-        
-        # Get AWS session (with optional role assumption)
-        session = get_aws_session(config)
-        
+        self._config = config
+
+        # Get AWS session (with optional role assumption); expiration is set when using assume role
+        session, self._session_expiration = get_aws_session(config)
+
         # Support both 'region' (single, backward compatible) and 'regions' (list)
         regions = config.get('regions', [])
         if not regions:
-            # Fall back to single region for backward compatibility
             single_region = config.get('region')
             if single_region:
                 regions = [single_region]
             else:
-                # If no region specified, use default region from session
                 regions = [session.region_name or 'us-east-1']
-        
-        # Store ACM clients per region
-        self.acm_clients = {}
-        for region in regions:
-            self.acm_clients[region] = session.client('acm', region_name=region)
-            print(f"Initialized ACM client for region: {region}")
-        
-        # Use first region for STS (STS is global, but needs a region for client)
-        self.primary_region = regions[0]
-        
-        # Initialize STS client to get AWS account ID
+        self._regions = list(regions)
+        self.primary_region = self._regions[0]
+
+        self._set_clients_from_session(session)
+
+        # Get selected tags configuration (list of tag keys to include)
+        selected_tags = config.get('selected-tags', [])
+        if selected_tags:
+            self.selected_tags = {tag.strip() for tag in selected_tags if tag.strip()}
+            logger.info("Filtering tags to include only: %s", sorted(self.selected_tags))
+        else:
+            self.selected_tags = None
+
+    def _set_clients_from_session(self, session, log_regions=True):
+        """Build ACM and STS clients from the given session. Used at init and on credential refresh."""
+        self.acm_clients = {
+            region: session.client('acm', region_name=region)
+            for region in self._regions
+        }
         self.sts_client = session.client('sts', region_name=self.primary_region)
-        
-        # Get AWS account ID
         try:
             self.aws_account = self.sts_client.get_caller_identity().get('Account', 'unknown')
         except Exception as e:
-            logger.warning(f"Error getting AWS account ID: {e}", exc_info=True)
+            logger.warning("Error getting AWS account ID: %s", e, exc_info=True)
             self.aws_account = 'unknown'
-        
-        # Get selected tags configuration (list of tag keys to include)
-        # If not provided or empty, include all tags (backward compatible)
-        selected_tags = config.get('selected-tags', [])
-        if selected_tags:
-            # Normalize selected tags to match how we process tag keys
-            # Convert to set for faster lookup, preserve original case
-            self.selected_tags = {tag.strip() for tag in selected_tags if tag.strip()}
-            print(f"Filtering tags to include only: {sorted(self.selected_tags)}")
-        else:
-            self.selected_tags = None  # None means include all tags
+        if log_regions:
+            for region in self._regions:
+                logger.info("Initialized ACM client for region: %s", region)
+
+    def _refresh_session(self):
+        """Re-assume the role and rebuild clients. Called when assumed-role credentials are near expiry."""
+        session, self._session_expiration = get_aws_session(self._config)
+        self._set_clients_from_session(session, log_regions=False)
+        logger.info("Refreshed assumed role credentials (expires %s)", self._session_expiration)
 
     def collect(self):
         """Collect metrics from all configured regions."""
+        # Refresh assumed-role credentials before they expire
+        if self._session_expiration is not None:
+            now = datetime.now(timezone.utc)
+            refresh_at = self._session_expiration - timedelta(minutes=self._REFRESH_MARGIN_MINUTES)
+            if now >= refresh_at:
+                try:
+                    self._refresh_session()
+                except Exception as e:
+                    logger.error("Failed to refresh assumed role credentials: %s", e, exc_info=True)
+                    # Continue with existing clients; next scrape may succeed after manual fix
+
         metrics_data = []
         now = datetime.now(timezone.utc)
-        
+
         # Collect certificates from all regions
         for region, acm_client in self.acm_clients.items():
             try:
@@ -129,7 +153,22 @@ class ACMCertificateCollector:
                     for page in page_iterator:
                         certs.extend(page.get('CertificateSummaryList', []))
                 except Exception as e:
-                    logger.error(f"Error listing certificates in region {region}: {e}", exc_info=True)
+                    err_msg = str(e)
+                    error_code = getattr(e, 'response', {}).get('Error', {}).get('Code', '') if isinstance(e, ClientError) else ''
+                    is_credential_error = (
+                        error_code == 'UnrecognizedClientException'
+                        or ('invalid' in err_msg.lower() and 'token' in err_msg.lower())
+                    )
+                    if is_credential_error:
+                        logger.error(
+                            "Error listing certificates in region %s: %s. "
+                            "Credentials may be invalid or expired. Check AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, "
+                            "AWS_SESSION_TOKEN (if using temporary credentials), and that credentials are passed into "
+                            "the container. See docs/configuration.md#troubleshooting.",
+                            region, err_msg
+                        )
+                    else:
+                        logger.error(f"Error listing certificates in region {region}: {e}", exc_info=True)
                     continue  # Continue with other regions
                 
                 # Process certificates from this region
