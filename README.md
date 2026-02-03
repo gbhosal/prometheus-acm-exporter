@@ -156,6 +156,14 @@ acm_certificate_expiry_duration_days{
 } 45.0
 ```
 
+## Grafana Dashboard
+
+A ready-to-use Grafana dashboard for ACM certificate expiry is provided:
+
+- **[grafana/dashboards/Prometheus ACM Exporter Dashboard.json](grafana/dashboards/Prometheus%20ACM%20Exporter%20Dashboard.json)**
+
+To use it: in Grafana go to **Dashboards** → **New** → **Import**, upload the JSON file (or paste its URL), then select your Prometheus datasource. The dashboard uses the `acm_certificate_expiry_duration_days` metric and supports filtering by AWS account, region, domain, certificate type, and export option.
+
 ## Endpoints
 
 - `/metrics`: Prometheus metrics endpoint
@@ -187,5 +195,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [Installation Guide](docs/installation.md)
 - [Configuration Reference](docs/configuration.md)
+- [Grafana Dashboard](grafana/dashboards/Prometheus%20ACM%20Exporter%20Dashboard.json)
 - [Development Guide](docs/development.md)
 - [Helm Chart Documentation](helm/prometheus-acm-exporter/README.md)
