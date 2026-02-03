@@ -3,7 +3,7 @@ entries:
   prometheus-acm-exporter:
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-02-03T09:25:34.521572444Z"
+    created: "2026-02-03T09:33:30.850662094Z"
     description: A Helm chart for Prometheus ACM Certificate Exporter
     digest: bea6771e7b45c5a79d79a16e18db3b9c3e85c4e61b7abd4528b46ed343ec6265
     keywords:
@@ -21,7 +21,7 @@ entries:
     version: 1.1.0-beta.1
   - apiVersion: v2
     appVersion: 1.0.0
-    created: "2026-02-03T09:25:34.52096639Z"
+    created: "2026-02-03T09:33:30.850145726Z"
     description: A Helm chart for Prometheus ACM Certificate Exporter
     digest: 4d2f1da3ef6beb322b8540473ec54edce56ecbeaca915e5cbb5af0e6cf5f7e1f
     keywords:
@@ -37,4 +37,4 @@ entries:
     urls:
     - https://gbhosal.github.io/prometheus-acm-exporter/charts/prometheus-acm-exporter-1.0.0.tgz
     version: 1.0.0
-generated: "2026-02-03T09:25:34.519273367Z"
+generated: "2026-02-03T09:33:30.848553211Z"
