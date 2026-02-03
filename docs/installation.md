@@ -184,7 +184,7 @@ You should see Prometheus metrics output with ACM certificate data.
 2. **Connection errors**: Verify network connectivity to AWS APIs
 3. **Permission denied**: Ensure IAM role/user has required ACM permissions
 4. **Config file not found**: Verify the config file path is correct
-5. **Missing certificates**: Only certificates with status `ISSUED` are included. Certificates in PENDING_VALIDATION, REVOKED, or other states are excluded
+5. **Missing certificates**: Only certificates with status `ISSUED` are included. Certificates in PENDING_VALIDATION, REVOKED, or other states are excluded.
 
 ### Debug Mode
 

@@ -24,7 +24,7 @@ A Prometheus exporter for AWS Certificate Manager (ACM) that collects certificat
 Pull and run the published image from GitHub Container Registry:
 
 ```bash
-# Pull the image (replace <owner> with your GitHub username/organization)
+# Pull the image from GHCR
 docker pull ghcr.io/gbhosal/prometheus-acm-exporter:latest
 
 # Run the container
@@ -32,7 +32,7 @@ docker run -p 9102:9102 \
   -v /path/to/config.yaml:/config/prometheus-acm-exporter.yaml \
   -e AWS_ACCESS_KEY_ID=your-key \
   -e AWS_SECRET_ACCESS_KEY=your-secret \
-  ghcr.io/<owner>/prometheus-acm-exporter:latest
+  ghcr.io/gbhosal/prometheus-acm-exporter:latest
 ```
 
 > **Note**: Images are automatically published to GHCR when GitHub releases are created. See [Docker Publishing Guide](docs/docker-publishing.md) for details.
@@ -135,6 +135,8 @@ The number of days until an ACM certificate expires.
 - `type`: Certificate type (AMAZON_ISSUED, IMPORTED, PRIVATE)
 - `renewal_eligibility`: Renewal eligibility status (ELIGIBLE, INELIGIBLE)
 - `export_option`: Export option (EXPORTED, NOT_EXPORTED)
+- `key_algorithm`: Key algorithm (e.g. RSA_2048, EC_prime256v1)
+- `in_use`: Whether the certificate is in use (`true` or `false`)
 - `tags_*`: Dynamic labels for selected ACM certificate tags (prefixed with `tags_`)
 
 **Example:**
@@ -147,6 +149,8 @@ acm_certificate_expiry_duration_days{
   type="AMAZON_ISSUED",
   renewal_eligibility="ELIGIBLE",
   export_option="NOT_EXPORTED",
+  key_algorithm="RSA_2048",
+  in_use="true",
   tags_Environment="production",
   tags_APPACCESS="myapp"
 } 45.0

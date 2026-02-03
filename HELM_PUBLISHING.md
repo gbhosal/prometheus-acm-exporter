@@ -1,5 +1,7 @@
 # Quick Start: Publishing Helm Chart
 
+> For a longer guide with manual publishing, OCI, and troubleshooting, see [docs/helm-repository.md](docs/helm-repository.md).
+
 ## 🚀 Quick Setup (5 minutes)
 
 ### Step 1: Enable GitHub Pages

@@ -1,6 +1,6 @@
 # Publishing Helm Chart to Repository
 
-This guide explains how to publish the Prometheus ACM Exporter Helm chart to a Helm repository.
+This guide explains how to publish the Prometheus ACM Exporter Helm chart to a Helm repository. For a short quick start, see [HELM_PUBLISHING.md](../HELM_PUBLISHING.md).
 
 ## Option 1: GitHub Pages (Recommended - Free & Automated)
 
@@ -140,7 +140,7 @@ Artifact Hub is a web-based application that helps you find, install and publish
 
 1. **Ensure your chart is published** (GitHub Pages, OCI, etc.)
 
-2. **Add Artifact Hub annotation** to your `Chart.yaml:
+2. **Add Artifact Hub annotation** to your `Chart.yaml`:
    ```yaml
    annotations:
      artifacthub.io/changes: |

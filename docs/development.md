@@ -14,10 +14,10 @@ This guide helps you set up a development environment for the Prometheus ACM Cer
 
 ### Initial Setup
 
-1. **Clone the repository:**
+1. **Clone the repository** (if contributing, fork the repo first and use your fork’s URL instead):
 ```bash
-git clone https://github.com/yourusername/acm-prometheus-exporter.git
-cd acm-prometheus-exporter
+git clone https://github.com/gbhosal/prometheus-acm-exporter.git
+cd prometheus-acm-exporter
 ```
 
 2. **Create a virtual environment:**

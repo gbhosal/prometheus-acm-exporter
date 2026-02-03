@@ -40,10 +40,10 @@ Feature suggestions are welcome! Please open an issue with:
 
 ### Setup Steps
 
-1. Clone the repository:
+1. Clone the repository (if you are contributing, fork the repo first and replace the URL below with your fork):
 ```bash
-git clone https://github.com/yourusername/acm-prometheus-exporter.git
-cd acm-prometheus-exporter
+git clone https://github.com/gbhosal/prometheus-acm-exporter.git
+cd prometheus-acm-exporter
 ```
 
 2. Create a virtual environment:
@@ -98,7 +98,7 @@ in the metrics output for better certificate identification.
 2. Update documentation if you've changed functionality
 3. Add tests for new features
 4. Ensure all tests pass
-5. Update CHANGELOG.md if applicable
+5. Update RELEASE_NOTES.md if applicable
 6. Request review from maintainers
 
 ## Questions?

@@ -207,7 +207,7 @@ Initialized ACM client for region: us-east-2
 2. **Invalid YAML**: Validate your YAML syntax
 3. **Region not accessible**: Verify AWS credentials have access to the specified regions
 4. **Role assumption fails**: Check IAM permissions and role ARN
-5. **No certificates appearing**: Remember that only `ISSUED` certificates are collected. Certificates in PENDING_VALIDATION or other states won't appear in metrics
+5. **No certificates appearing**: Remember that only `ISSUED` certificates are collected. Certificates in PENDING_VALIDATION or other states won't appear in metrics.
 
 ### "The security token included in the request is invalid" (UnrecognizedClientException)
 
