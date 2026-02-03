@@ -12,7 +12,7 @@ image:
   # Default tag - uses 'latest' for most recent release
   # Override with specific version tag (e.g., v1.0.0, 1.0.0) for versioned releases
   # The Chart.yaml appVersion is used as fallback if tag is not specified
-  tag: "v1.0.0"
+  tag: "v1.0.1-alpha"
 
 imagePullSecrets: []
 nameOverride: ""
