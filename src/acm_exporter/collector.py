@@ -190,7 +190,7 @@ class ACMCertificateCollector:
                         except Exception:
                             certificate_id = arn  # Fallback to full ARN if parsing fails
 
-                    # Extract Type, RenewalEligibility, and ExportOption from certificate summary
+                    # Extract Type, RenewalEligibility, ExportOption, KeyAlgorithm, and InUse from certificate summary
                     cert_type = cert.get('Type', '')
                     renewal_eligibility = cert.get('RenewalEligibility', '')
                     # ExportOption might be in the cert summary - check for it
@@ -200,6 +200,9 @@ class ACMCertificateCollector:
                         exported = cert.get('Exported', None)
                         if exported is not None:
                             export_option = 'EXPORTED' if exported else 'NOT_EXPORTED'
+                    key_algorithm = cert.get('KeyAlgorithm', '')
+                    in_use = cert.get('InUse', False)
+                    in_use_label = 'true' if in_use else 'false'
 
                     # Calculate days until expiration
                     # Ensure both dates are timezone-aware for subtraction
@@ -238,6 +241,8 @@ class ACMCertificateCollector:
                         'type': cert_type,
                         'renewal_eligibility': renewal_eligibility,
                         'export_option': export_option,
+                        'key_algorithm': key_algorithm,
+                        'in_use': in_use_label,
                         'tags': tags
                     })
             except Exception as e:
@@ -262,7 +267,7 @@ class ACMCertificateCollector:
             # Only include tag keys that are present (and non-empty) for this group
             # For certificates with no tags, sorted_tag_keys will be an empty list []
             sorted_tag_keys = sorted(tag_keys)
-            label_names = ['region', 'aws_account', 'certificate_id', 'domain', 'type', 'renewal_eligibility', 'export_option'] + sorted_tag_keys
+            label_names = ['region', 'aws_account', 'certificate_id', 'domain', 'type', 'renewal_eligibility', 'export_option', 'key_algorithm', 'in_use'] + sorted_tag_keys
             
             gauge = GaugeMetricFamily(
                 'acm_certificate_expiry_duration_days',
@@ -283,7 +288,9 @@ class ACMCertificateCollector:
                     item['domain'],
                     item['type'],
                     item['renewal_eligibility'],
-                    item['export_option']
+                    item['export_option'],
+                    item['key_algorithm'],
+                    item['in_use']
                 ] + tag_labels
                 gauge.add_metric(labels, item['days_remaining'])
             
